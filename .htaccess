@@ -1,8 +1,0 @@
-RewriteEngine On
-
-# Non reindirizzare richieste per file esistenti (es. immagini, CSS, JS, etc.)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# Reindirizza tutte le richieste al file index.html per il routing di AngularJS
-RewriteRule ^ index.html [QSA,L]
