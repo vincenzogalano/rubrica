@@ -68,7 +68,7 @@ app.controller("LoginController", [
           $location.path("/contatti");
         })
         .catch((err) => {
-          $scope.errorMessage = err.message;
+          $scope.errorMessage = err.data.message;
         });
     };
   },
@@ -103,13 +103,14 @@ app.controller("RegisterController", [
 
       $http
         .post("https://rubrica-api.onrender.com/api/user/register", $scope.user)
-        .then(function (response) {
+        .then(function (res) {
           $scope.registrationSuccess = true;
-          $scope.registrationSuccessMessage = response.data.message;
+          $scope.registrationSuccessMessage = res.data.message;    
+          $scope.user = {};
         })
-        .catch(function (error) {
+        .catch(function (err) {
           $scope.registrationFailed = true;
-          $scope.registrationFailedMessage = error.message;
+          $scope.registrationFailedMessage = err.data.message;
         });
     };
   },
@@ -205,9 +206,13 @@ app.controller("NuovoContattoController", [
       if ($scope.add.nome && $scope.add.cognome && $scope.add.cellulare) {
         if (AUTH_TOKEN) {
           $http
-            .post("https://rubrica-api.onrender.com/api/contacts/add", $scope.add, {
-              headers: { Authorization: "Bearer " + AUTH_TOKEN },
-            })
+            .post(
+              "https://rubrica-api.onrender.com/api/contacts/add",
+              $scope.add,
+              {
+                headers: { Authorization: "Bearer " + AUTH_TOKEN },
+              }
+            )
             .then((res) => {
               $location.path("/contatti");
             })
@@ -260,9 +265,13 @@ app.controller("ModificaContattoController", [
         $scope.errorMessage = "";
 
         $http
-          .put("https://rubrica-api.onrender.com/api/contacts/edit", updatedContact, {
-            headers: { Authorization: "Bearer " + AUTH_TOKEN },
-          })
+          .put(
+            "https://rubrica-api.onrender.com/api/contacts/edit",
+            updatedContact,
+            {
+              headers: { Authorization: "Bearer " + AUTH_TOKEN },
+            }
+          )
           .then((res) => ($scope.successMessage = res.data.message))
           .catch((err) => ($scope.errorMessage = err.message));
       };
@@ -287,9 +296,13 @@ app.controller("PasswordDimenticataController", [
 
       if ($scope.email.length > 0) {
         $http
-          .post("https://rubrica-api.onrender.com/api/user/send_edit_password", null, {
-            params: { email: $scope.email },
-          })
+          .post(
+            "https://rubrica-api.onrender.com/api/user/send_edit_password",
+            null,
+            {
+              params: { email: $scope.email },
+            }
+          )
           .then((res) => {
             $scope.successMessage = "Controlla la tua casella e-mail";
             $scope.email = "";
@@ -345,12 +358,16 @@ app.controller("ResetPasswordController", [
       }
 
       $http
-        .post("https://rubrica-api.onrender.com/api/user/reset_password", null, {
-          params: {
-            password: $scope.nuova_password,
-            resetToken: $location.search().reset_token,
-          },
-        })
+        .post(
+          "https://rubrica-api.onrender.com/api/user/reset_password",
+          null,
+          {
+            params: {
+              password: $scope.nuova_password,
+              resetToken: $location.search().reset_token,
+            },
+          }
+        )
         .then((res) => {
           $scope.successMessage = res.data.message;
           $scope.nuova_password = "";

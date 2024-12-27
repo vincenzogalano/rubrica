@@ -10,7 +10,9 @@
             <label for="password">Password</label>
             <input class="rounded" type="password" id="password" name="password" ng-model="user.password">
         </div>
-        <span class="error" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
+        <div class="text-center">
+            <span class="text-danger" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
+        </div>
         <button class="primary-button my-1" type="submit">Accedi</button>
     </form>
     <div class="d-flex flex-column mt-3">
