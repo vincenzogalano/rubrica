@@ -74,3 +74,80 @@ button:hover {
   background-color: #405cf5 !important;
   opacity: 0.7 !important;
 }
+
+:root {
+  --light-gray: #d3d3d3;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Open Sans", sans-serif;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  outline: none;
+  border: none;
+  border-bottom: 1px solid var(--light-gray);
+  width: 100%;
+  padding: 0.5rem;
+}
+
+button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background-color: #405cf5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.new-contact-button,
+.edit-password-button {
+  color: #fff;
+  background-color: #405cf5;
+}
+
+.contacts-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.contact-info {
+  min-width: 120px;
+  display: inline-block;
+}
+
+.cur-pointer {
+  cursor: pointer;
+}
+
+.btn.new-contact-button:hover,
+.edit-password-button:hover {
+  color: #fff;
+  background-color: #405cf5 !important;
+  opacity: 0.7 !important;
+}
