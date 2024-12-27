@@ -47,7 +47,8 @@ app.controller("LoginController", [
   "$scope",
   "$http",
   "$location",
-  function ($scope, $http, $location) {
+  "API_URL",
+  function ($scope, $http, $location, API_URL) {
     $scope.errorMessage = "";
     $scope.user = {};
 
@@ -76,7 +77,8 @@ app.controller("LoginController", [
 app.controller("RegisterController", [
   "$scope",
   "$http",
-  function ($scope, $http) {
+  "API_URL",
+  function ($scope, $http, API_URL) {
     $scope.registrationSuccess = false;
     $scope.registrationFailed = false;
     $scope.registrationSuccessMessage = "";
@@ -117,7 +119,8 @@ app.controller("ContattiController", [
   "$scope",
   "$http",
   "$location",
-  function ($scope, $http, $location) {
+  "API_URL",
+  function ($scope, $http, $location, API_URL) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.allContacts = {};
@@ -191,7 +194,8 @@ app.controller("NuovoContattoController", [
   "$scope",
   "$http",
   "$location",
-  function ($scope, $http, $location) {
+  "API_URL",
+  function ($scope, $http, $location, API_URL) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.add = {};
@@ -222,7 +226,8 @@ app.controller("ModificaContattoController", [
   "$scope",
   "$http",
   "$location",
-  function ($scope, $http, $location) {
+  "API_URL",
+  function ($scope, $http, $location, API_URL) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.successMessage = "";
@@ -270,7 +275,8 @@ app.controller("ModificaContattoController", [
 app.controller("PasswordDimenticataController", [
   "$scope",
   "$http",
-  function ($scope, $http) {
+  "API_URL",
+  function ($scope, $http, API_URL) {
     $scope.email = "";
     $scope.errorMessage = "";
     $scope.successMessage = "";
@@ -301,7 +307,8 @@ app.controller("ResetPasswordController", [
   "$scope",
   "$http",
   "$location",
-  function ($scope, $http, $location) {
+  "API_URL",
+  function ($scope, $http, $location, API_URL) {
     if (!$location.search().reset_token) {
       $location.path("/");
     }
@@ -361,7 +368,8 @@ app.controller("ModificaPasswordController", [
   "$scope",
   "$http",
   "$location",
-  function ($scope, $http, $location) {
+  "API_URL",
+  function ($scope, $http, $location, API_URL) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.isDisabled = false;
