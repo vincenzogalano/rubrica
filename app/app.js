@@ -62,7 +62,7 @@ app.controller("LoginController", [
       $scope.errorMessage = "";
 
       $http
-        .post(`${API_URL}/api/user/login`, $scope.user)
+        .post("https://rubrica-api.onrender.com/api/user/login", $scope.user)
         .then((res) => {
           localStorage.setItem("auth_token", res.data.token);
           $location.path("/contatti");
@@ -102,7 +102,7 @@ app.controller("RegisterController", [
       }
 
       $http
-        .post(`${API_URL}/api/user/register`, $scope.user)
+        .post("https://rubrica-api.onrender.com/api/user/register", $scope.user)
         .then(function (response) {
           $scope.registrationSuccess = true;
           $scope.registrationSuccessMessage = response.data.message;
@@ -129,7 +129,7 @@ app.controller("ContattiController", [
     if (AUTH_TOKEN) {
       $scope.message = "";
       $http
-        .get(`${API_URL}/api/contacts/all`, {
+        .get("https://rubrica-api.onrender.com/api/contacts/all", {
           headers: { Authorization: "Bearer " + AUTH_TOKEN },
         })
         .then((res) => {
@@ -152,7 +152,7 @@ app.controller("ContattiController", [
     $scope.deleteContact = function (id) {
       if (AUTH_TOKEN) {
         $http
-          .delete(`${API_URL}/api/contacts/delete`, {
+          .delete("https://rubrica-api.onrender.com/api/contacts/delete", {
             params: { userId: id },
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
@@ -172,7 +172,7 @@ app.controller("ContattiController", [
 
       if (AUTH_TOKEN) {
         $http
-          .get(`${API_URL}/api/contacts/byValues`, {
+          .get("https://rubrica-api.onrender.com/api/contacts/byValues", {
             params: { nome: nome, cognome: cognome, cellulare: cellulare },
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
@@ -205,7 +205,7 @@ app.controller("NuovoContattoController", [
       if ($scope.add.nome && $scope.add.cognome && $scope.add.cellulare) {
         if (AUTH_TOKEN) {
           $http
-            .post(`${API_URL}/api/contacts/add`, $scope.add, {
+            .post("https://rubrica-api.onrender.com/api/contacts/add", $scope.add, {
               headers: { Authorization: "Bearer " + AUTH_TOKEN },
             })
             .then((res) => {
@@ -237,7 +237,7 @@ app.controller("ModificaContattoController", [
     if (AUTH_TOKEN) {
       console.log($location.search().id);
       $http
-        .get(`${API_URL}/api/contacts/byId`, {
+        .get("https://rubrica-api.onrender.com/api/contacts/byId", {
           params: { id: $location.search().id },
           headers: { Authorization: "Bearer " + AUTH_TOKEN },
         })
@@ -260,7 +260,7 @@ app.controller("ModificaContattoController", [
         $scope.errorMessage = "";
 
         $http
-          .put(`${API_URL}/api/contacts/edit`, updatedContact, {
+          .put("https://rubrica-api.onrender.com/api/contacts/edit", updatedContact, {
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
           .then((res) => ($scope.successMessage = res.data.message))
@@ -287,7 +287,7 @@ app.controller("PasswordDimenticataController", [
 
       if ($scope.email.length > 0) {
         $http
-          .post(`${API_URL}/api/user/send_edit_password`, null, {
+          .post("https://rubrica-api.onrender.com/api/user/send_edit_password", null, {
             params: { email: $scope.email },
           })
           .then((res) => {
@@ -345,7 +345,7 @@ app.controller("ResetPasswordController", [
       }
 
       $http
-        .post(`${API_URL}/api/user/reset_password`, null, {
+        .post("https://rubrica-api.onrender.com/api/user/reset_password", null, {
           params: {
             password: $scope.nuova_password,
             resetToken: $location.search().reset_token,
@@ -406,7 +406,7 @@ app.controller("ModificaPasswordController", [
 
       $http
         .post(
-          `${API_URL}/api/user/edit_password`,
+          "https://rubrica-api.onrender.com/api/user/edit_password",
           { password: $scope.nuova_password },
           {
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
