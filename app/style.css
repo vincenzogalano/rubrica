@@ -23,7 +23,6 @@ body {
   background-color: #f5f5f5;
 }
 
-/* Stile generale per input e pulsanti */
 input[type="text"],
 input[type="password"],
 input[type="email"] {
@@ -56,12 +55,12 @@ button:hover {
 }
 
 .contacts-list-container {
-  max-height: 400px; /* Limita l'altezza della colonna destra */
-  overflow-y: auto; /* Rende la colonna scrollabile */
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .contact-info {
-  min-width: 120px; /* Larghezza fissa per garantire che tutte le colonne siano allineate */
+  min-width: 120px;
   display: inline-block;
 }
 
