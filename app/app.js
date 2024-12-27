@@ -1,5 +1,7 @@
 const app = angular.module("app", ["ngRoute"]);
 
+app.constant("API_URL", "https://rubrica-api.onrender.com");
+
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
     .when("/", {
@@ -59,7 +61,7 @@ app.controller("LoginController", [
       $scope.errorMessage = "";
 
       $http
-        .post("http://localhost:8080/api/user/login", $scope.user)
+        .post(`${API_URL}/api/user/login`, $scope.user)
         .then((res) => {
           localStorage.setItem("auth_token", res.data.token);
           $location.path("/contatti");
@@ -98,7 +100,7 @@ app.controller("RegisterController", [
       }
 
       $http
-        .post("http://localhost:8080/api/user/register", $scope.user)
+        .post(`${API_URL}/api/user/register`, $scope.user)
         .then(function (response) {
           $scope.registrationSuccess = true;
           $scope.registrationSuccessMessage = response.data.message;
@@ -124,7 +126,7 @@ app.controller("ContattiController", [
     if (AUTH_TOKEN) {
       $scope.message = "";
       $http
-        .get("http://localhost:8080/api/contacts/all", {
+        .get(`${API_URL}/api/contacts/all`, {
           headers: { Authorization: "Bearer " + AUTH_TOKEN },
         })
         .then((res) => {
@@ -147,7 +149,7 @@ app.controller("ContattiController", [
     $scope.deleteContact = function (id) {
       if (AUTH_TOKEN) {
         $http
-          .delete("http://localhost:8080/api/contacts/delete", {
+          .delete(`${API_URL}/api/contacts/delete`, {
             params: { userId: id },
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
@@ -167,7 +169,7 @@ app.controller("ContattiController", [
 
       if (AUTH_TOKEN) {
         $http
-          .get("http://localhost:8080/api/contacts/byValues", {
+          .get(`${API_URL}/api/contacts/byValues`, {
             params: { nome: nome, cognome: cognome, cellulare: cellulare },
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
@@ -199,7 +201,7 @@ app.controller("NuovoContattoController", [
       if ($scope.add.nome && $scope.add.cognome && $scope.add.cellulare) {
         if (AUTH_TOKEN) {
           $http
-            .post("http://localhost:8080/api/contacts/add", $scope.add, {
+            .post(`${API_URL}/api/contacts/add`, $scope.add, {
               headers: { Authorization: "Bearer " + AUTH_TOKEN },
             })
             .then((res) => {
@@ -230,7 +232,7 @@ app.controller("ModificaContattoController", [
     if (AUTH_TOKEN) {
       console.log($location.search().id);
       $http
-        .get("http://localhost:8080/api/contacts/byId", {
+        .get(`${API_URL}/api/contacts/byId`, {
           params: { id: $location.search().id },
           headers: { Authorization: "Bearer " + AUTH_TOKEN },
         })
@@ -253,7 +255,7 @@ app.controller("ModificaContattoController", [
         $scope.errorMessage = "";
 
         $http
-          .put("http://localhost:8080/api/contacts/edit", updatedContact, {
+          .put(`${API_URL}/api/contacts/edit`, updatedContact, {
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
           .then((res) => ($scope.successMessage = res.data.message))
@@ -279,7 +281,7 @@ app.controller("PasswordDimenticataController", [
 
       if ($scope.email.length > 0) {
         $http
-          .post("http://localhost:8080/api/user/send_edit_password", null, {
+          .post(`${API_URL}/api/user/send_edit_password`, null, {
             params: { email: $scope.email },
           })
           .then((res) => {
@@ -336,7 +338,7 @@ app.controller("ResetPasswordController", [
       }
 
       $http
-        .post("http://localhost:8080/api/user/reset_password", null, {
+        .post(`${API_URL}/api/user/reset_password`, null, {
           params: {
             password: $scope.nuova_password,
             resetToken: $location.search().reset_token,
@@ -368,98 +370,48 @@ app.controller("ModificaPasswordController", [
     $scope.errorMessage = "";
     $scope.successMessage = "";
 
-    if (AUTH_TOKEN) {
-      $scope.editPassword = function () {
-        $scope.errorMessage = "";
-        $scope.successMessage = "";
-
-        if (!$scope.nuova_password) {
-          $scope.errorMessage = "Inserisci una nuova password";
-          return;
-        }
-        if (!$scope.conferma_password) {
-          $scope.errorMessage = "Inserisci nuovamente la nuova password";
-          return;
-        }
-        if ($scope.nuova_password !== $scope.conferma_password) {
-          $scope.errorMessage = "Le password inserite non corrispondono";
-          return;
-        }
-        if (!$scope.nuova_password && !$scope.conferma_password) {
-          $scope.errorMessage = "Compila i campi per modificare la password";
-          return;
-        }
-
-        $http
-          .post("http://localhost:8080/api/user/edit_password", null, {
-            params: { password: $scope.nuova_password },
-            headers: { Authorization: "Bearer " + AUTH_TOKEN },
-          })
-          .then((res) => {
-            $scope.successMessage = res.data.message;
-            $scope.nuova_password = "";
-            $scope.conferma_password = "";
-          })
-          .catch((err) => {
-            $scope.errorMessage = err.data.message;
-          });
-      };
-    } else {
+    if (!AUTH_TOKEN) {
       $location.path("/");
-      app.controller("ModificaPasswordController", [
-        "$scope",
-        "$http",
-        "$location",
-        function ($scope, $http, $location) {
-          const AUTH_TOKEN = localStorage.getItem("auth_token");
+      return;
+    }
 
-          $scope.isDisabled = false;
+    $scope.editPassword = function () {
+      $scope.errorMessage = "";
+      $scope.successMessage = "";
+
+      if (!$scope.nuova_password) {
+        $scope.errorMessage = "Inserisci una nuova password";
+        return;
+      }
+      if (!$scope.conferma_password) {
+        $scope.errorMessage = "Inserisci nuovamente la nuova password";
+        return;
+      }
+      if ($scope.nuova_password !== $scope.conferma_password) {
+        $scope.errorMessage = "Le password inserite non corrispondono";
+        return;
+      }
+      if (!$scope.nuova_password && !$scope.conferma_password) {
+        $scope.errorMessage = "Compila i campi per modificare la password";
+        return;
+      }
+
+      $http
+        .post(
+          `${API_URL}/api/user/edit_password`,
+          { password: $scope.nuova_password },
+          {
+            headers: { Authorization: "Bearer " + AUTH_TOKEN },
+          }
+        )
+        .then((res) => {
+          $scope.successMessage = res.data.message;
           $scope.nuova_password = "";
           $scope.conferma_password = "";
-          $scope.errorMessage = "";
-          $scope.successMessage = "";
-
-          if (AUTH_TOKEN) {
-            $scope.editPassword = function () {
-              $scope.errorMessage = "";
-              $scope.successMessage = "";
-
-              if (!$scope.nuova_password) {
-                $scope.errorMessage = "Inserisci una nuova password";
-                return;
-              }
-              if (!$scope.conferma_password) {
-                $scope.errorMessage = "Inserisci nuovamente la nuova password";
-                return;
-              }
-              if ($scope.nuova_password !== $scope.conferma_password) {
-                $scope.errorMessage = "Le password inserite non corrispondono";
-                return;
-              }
-              if (!$scope.nuova_password && !$scope.conferma_password) {
-                $scope.errorMessage =
-                  "Compila i campi per modificare la password";
-                return;
-              }
-
-              $http
-                .post(
-                  "http://localhost:8080/api/user/edit_password",
-                  { password: $scope.nuova_password },
-                  { headers: { Authorization: "Bearer " + AUTH_TOKEN }, }
-                )
-                .then((res) => {
-                  $scope.successMessage = res.data.message;
-                  $scope.nuova_password = "";
-                  $scope.conferma_password = "";
-                })
-                .catch((err) => {
-                  $scope.errorMessage = err.data.message;
-                });
-            };
-          }
-        },
-      ]);
-    }
+        })
+        .catch((err) => {
+          $scope.errorMessage = err.data.message || "Errore sconosciuto";
+        });
+    };
   },
 ]);
