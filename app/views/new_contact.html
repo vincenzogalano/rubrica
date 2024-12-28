@@ -1,18 +1,21 @@
-<div class="new-contact-container default-shadow">
+<div class="new-contact-container shadow p-3">
     <h2>Aggiungi Nuovo Contatto</h2>
-    <div class="form-input my-1">
+    <div class="form-input my-3">
         <label for="name">Nome</label>
         <input type="text" id="name" name="name" ng-model="add.nome">
     </div>
-    <div class="form-input my-1">
+    <div class="form-input my-3">
         <label for="surname">Cognome</label>
         <input type="text" id="surname" name="surname" ng-model="add.cognome">
     </div>
-    <div class="form-input my-1">
+    <div class="form-input my-3">
         <label for="cell">Cellulare</label>
         <input type="text" id="cell" name="cell" ng-model="add.cellulare">
     </div>
-    <span class="error" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
-    <button class="primary-button my-1" ng-click="addContact()">Aggiungi</button>
+    <div class="text-center">
+        <span class="text-danger" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
+        <span class="text-success" ng-show="successMessage.length > 0">{{successMessage}}</span>
+    </div>
+    <button class="primary-button my-2" ng-click="addContact()">Aggiungi</button>
     <a ng-href="/contatti" class="btn btn-danger w-100">Torna Indietro</a>
 </div>

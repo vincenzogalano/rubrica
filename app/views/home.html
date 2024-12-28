@@ -1,25 +1,25 @@
 <div class="login-container my-4 p-3 shadow">
     <h2>Accedi alla tua Rubrica</h2>
     <form ng-submit="authenticateUser()">
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="username">Nome</label>
             <input class="rounded" type="text" id="username" name="username" ng-model="user.username">
         </div>
 
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="password">Password</label>
             <input class="rounded" type="password" id="password" name="password" ng-model="user.password">
         </div>
         <div class="text-center">
             <span class="text-danger" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
         </div>
-        <button class="primary-button my-1" type="submit">Accedi</button>
+        <button class="primary-button my-2" type="submit">Accedi</button>
     </form>
-    <div class="d-flex flex-column mt-3">
+    <div class="d-flex flex-column">
         <div class="register-link">
-            <p>Non hai un account? <a href="/registrazione">Registrati qui</a></p>
+            <a class="btn register-button d-block" href="/registrazione">Registrati qui</a>
         </div>
-        <div class="password-reset-link">
+        <div class="password-reset-link mt-2">
             Hai dimenticato la password?
             <a href="/password_dimenticata">Reimpostala qui</a>
         </div>

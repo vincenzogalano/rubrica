@@ -27,6 +27,9 @@
         </div>
         <div class="col-md-6">
             <h2>Lista Contatti</h2>
+            <div class="text-center alert alert-info" ng-show="message.length > 0">
+                {{message}}
+            </div>
             <div class="contacts-list-container">
                 <ul class="list-unstyled mt-3">
                     <li class="d-flex py-2 border-bottom" ng-repeat="contact in allContacts">

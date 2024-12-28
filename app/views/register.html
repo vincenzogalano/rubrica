@@ -1,63 +1,59 @@
 <div class="register-container my-4 p-3 shadow" ng-app="rubricaApp" ng-controller="RegisterController">
     <h2>Registrati alla tua Rubrica</h2>
     <form ng-submit="registerUser()">
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="username">Nome utente</label>
-            <input type="text" id="username" name="username" ng-model="user.username" required>
+            <input type="text" id="username" name="username" ng-model="user.username">
         </div>
 
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" ng-model="user.password" required minlength="8">
+            <input class="rounded" type="password" id="password" name="password" ng-model="user.password" minlength="8">
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="conferma-password">Conferma Password</label>
-            <input type="password" id="conferma-password" name="conferma-password" ng-model="confermaPassword" required>
+            <input class="rounded" type="password" id="conferma-password" name="conferma-password"
+                ng-model="confermaPassword">
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" ng-model="user.email" required>
+            <input class="rounded" type="email" id="email" name="email" ng-model="user.email">
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="conferma-email">Conferma Email</label>
-            <input type="email" id="conferma-email" name="conferma-email" ng-model="confermaEmail" required>
+            <input class="rounded" type="email" id="conferma-email" name="conferma-email" ng-model="confermaEmail">
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" ng-model="user.nome" required>
+            <input class="rounded" type="text" id="nome" name="nome" ng-model="user.nome">
         </div>
 
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="cognome">Cognome</label>
-            <input type="text" id="cognome" name="cognome" ng-model="user.cognome" required>
+            <input class="rounded" type="text" id="cognome" name="cognome" ng-model="user.cognome">
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="data_di_nascita">Data di nascita</label>
-            <input type="date" id="data_di_nascita" name="data_di_nascita" ng-model="user.data_di_nascita" required>
+            <input class="form-control" type="date" id="data_di_nascita" name="data_di_nascita"
+                ng-model="user.data_di_nascita">
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="sesso">Sesso</label>
-            <select name="sesso" ng-model="user.sesso" required>
+            <select class="form-select" name="sesso" ng-model="user.sesso">
                 <option value="M">Uomo</option>
                 <option value="F">Donna</option>
             </select>
         </div>
-
-        <div class="form-input my-1">
+        <div class="form-input my-3">
             <label for="citta">Città</label>
-            <input type="text" id="citta" name="citta" ng-model="user.citta" required>
+            <input class="rounded" type="text" id="citta" name="citta" ng-model="user.citta">
         </div>
-
-        <button class="primary-button my-1" type="submit">Registrati</button>
+        <button class="primary-button my-3" type="submit">Registrati</button>
     </form>
-    <span class="success" ng-show="registrationSuccess">{{registrationSuccessMessage}}</span>
-    <span class="error" ng-show="registrationFailed">{{registrationFailedMessage}}</span>
+    <div class="text-center">
+        <span class="text-success" ng-show="registrationSuccess">{{registrationSuccessMessage}}</span>
+        <span class="text-danger" ng-show="registrationFailed">{{registrationFailedMessage}}</span>
+    </div>
     <div class="login-link">
         <p>Hai già un account? <a href="/">Accedi qui</a></p>
     </div>

@@ -4,27 +4,25 @@
         <div class="mb-3">
             <label for="nome" class="form-label">Nome</label>
             <input type="text" class="form-control" id="nome" name="nome" placeholder="Inserisci il nome"
-                ng-model="edit.nome" required>
+                ng-model="edit.nome">
         </div>
-
         <div class="mb-3">
             <label for="cognome" class="form-label">Cognome</label>
             <input type="text" class="form-control" id="cognome" name="cognome" placeholder="Inserisci il cognome"
-                ng-model="edit.cognome" required>
+                ng-model="edit.cognome">
         </div>
-
         <div class="mb-3">
             <label for="cellulare" class="form-label">Cellulare</label>
             <input type="tel" class="form-control" id="cellulare" name="cellulare"
-                placeholder="Inserisci il numero di cellulare" pattern="[0-9]{10}" ng-model="edit.cellulare" required>
+                placeholder="Inserisci il numero di cellulare" ng-model="edit.cellulare">
         </div>
-
-        <span class="text-center d-block text-success" ng-show="successMessage.length > 0">{{successMessage}}</span>
-        <span class="text-center d-block text-danger" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
-
+        <div class="text-center my-3">
+            <span class="text-success" ng-show="successMessage.length > 0">{{successMessage}}</span>
+            <span class="text-danger" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
+        </div>
         <div class="d-flex flex-column">
+            <button class="btn btn-primary my-2" ng-click="editContact()">Modifica Contatto</button>
             <a ng-href="/contatti" class="btn btn-danger">Torna indietro</a>
-            <button class="btn btn-primary" ng-click="editContact()">Modifica Contatto</button>
         </div>
     </form>
 </div>

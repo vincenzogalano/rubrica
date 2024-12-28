@@ -90,6 +90,14 @@ app.controller("RegisterController", [
       $scope.registrationSuccess = false;
       $scope.registrationFailed = false;
 
+      for (let [key, value] of Object.entries($scope.user)) {
+        if (!value || value.trim() === "") {
+          $scope.registrationFailed = true;
+          $scope.registrationFailedMessage = "Compilare tutti i campi";
+          return;
+        }
+      }
+
       if ($scope.confermaPassword != $scope.user.password) {
         $scope.registrationFailed = true;
         $scope.registrationFailedMessage =
@@ -105,7 +113,7 @@ app.controller("RegisterController", [
         .post("https://rubrica-api.onrender.com/api/user/register", $scope.user)
         .then(function (res) {
           $scope.registrationSuccess = true;
-          $scope.registrationSuccessMessage = res.data.message;    
+          $scope.registrationSuccessMessage = res.data.message;
           $scope.user = {};
         })
         .catch(function (err) {
@@ -178,13 +186,14 @@ app.controller("ContattiController", [
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
           .then((res) => {
+            $scope.message = "";
             $scope.allContacts = res.data.data;
           })
-          .catch((error) => {
-            if ((error.status = 404)) {
+          .catch((err) => {
+            if ((err.status = 404)) {
               $scope.allContacts = {};
             }
-            console.error("Errore durante la ricerca dei contatti", error);
+            $scope.message = err.data.message;
           });
       }
     };
@@ -200,10 +209,20 @@ app.controller("NuovoContattoController", [
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.add = {};
+    $scope.errorMessage = "";
+    $scope.successMessage = "";
 
     $scope.addContact = function () {
       $scope.errorMessage = "";
+      $scope.successMessage = "";
       if ($scope.add.nome && $scope.add.cognome && $scope.add.cellulare) {
+        const CELL_REGEX = /^\d{10}$/;
+
+        if (!CELL_REGEX.test($scope.add.cellulare)) {
+          $scope.errorMessage = "Inserire un numero di cellulare valido";
+          return;
+        }
+
         if (AUTH_TOKEN) {
           $http
             .post(
@@ -214,7 +233,8 @@ app.controller("NuovoContattoController", [
               }
             )
             .then((res) => {
-              $location.path("/contatti");
+              $scope.add = {};
+              $scope.successMessage = res.data.message;
             })
             .catch((err) => {
               $scope.errorMessage = err.data.message;
@@ -240,7 +260,6 @@ app.controller("ModificaContattoController", [
     $scope.edit = {};
 
     if (AUTH_TOKEN) {
-      console.log($location.search().id);
       $http
         .get("https://rubrica-api.onrender.com/api/contacts/byId", {
           params: { id: $location.search().id },
@@ -251,9 +270,11 @@ app.controller("ModificaContattoController", [
           $scope.edit.cognome = res.data.data.cognome;
           $scope.edit.cellulare = res.data.data.cellulare;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => err.data.message);
 
       $scope.editContact = function () {
+        const CELL_REGEX = /^\d{10}$/;
+
         let updatedContact = {
           id: $location.search().id,
           nome: $scope.edit.nome,
@@ -264,6 +285,20 @@ app.controller("ModificaContattoController", [
         $scope.successMessage = "";
         $scope.errorMessage = "";
 
+        if (
+          !updatedContact.nome ||
+          !updatedContact.cognome ||
+          !updatedContact.cellulare
+        ) {
+          $scope.errorMessage = "Compilare i campi correttamente";
+          return;
+        }
+
+        if (!CELL_REGEX.test(updatedContact.cellulare)) {
+          $scope.errorMessage = "Inserire un numero di cellulare valido";
+          return;
+        }
+
         $http
           .put(
             "https://rubrica-api.onrender.com/api/contacts/edit",
@@ -273,7 +308,7 @@ app.controller("ModificaContattoController", [
             }
           )
           .then((res) => ($scope.successMessage = res.data.message))
-          .catch((err) => ($scope.errorMessage = err.message));
+          .catch((err) => ($scope.errorMessage = err.data.message));
       };
     } else {
       $location.path("/");
