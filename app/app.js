@@ -1,6 +1,8 @@
+import configurations from "./config.js";
+
 const app = angular.module("app", ["ngRoute"]);
 
-app.constant("API_URL", "https://rubrica-api.onrender.com");
+app.constant("CONFIG", configurations);
 
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
@@ -47,8 +49,8 @@ app.controller("LoginController", [
   "$scope",
   "$http",
   "$location",
-  "API_URL",
-  function ($scope, $http, $location, API_URL) {
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
     $scope.errorMessage = "";
     $scope.user = {};
 
@@ -62,7 +64,7 @@ app.controller("LoginController", [
       $scope.errorMessage = "";
 
       $http
-        .post("https://rubrica-api.onrender.com/api/user/login", $scope.user)
+        .post(`${CONFIG.apiUrl}/api/user/login`, $scope.user)
         .then((res) => {
           localStorage.setItem("auth_token", res.data.token);
           $location.path("/contatti");
@@ -77,8 +79,8 @@ app.controller("LoginController", [
 app.controller("RegisterController", [
   "$scope",
   "$http",
-  "API_URL",
-  function ($scope, $http, API_URL) {
+  "CONFIG",
+  function ($scope, $http, CONFIG) {
     $scope.registrationSuccess = false;
     $scope.registrationFailed = false;
     $scope.registrationSuccessMessage = "";
@@ -110,7 +112,7 @@ app.controller("RegisterController", [
       }
 
       $http
-        .post("https://rubrica-api.onrender.com/api/user/register", $scope.user)
+        .post(`${CONFIG.apiUrl}/api/user/register`, $scope.user)
         .then(function (res) {
           $scope.registrationSuccess = true;
           $scope.registrationSuccessMessage = res.data.message;
@@ -128,8 +130,8 @@ app.controller("ContattiController", [
   "$scope",
   "$http",
   "$location",
-  "API_URL",
-  function ($scope, $http, $location, API_URL) {
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.allContacts = {};
@@ -138,7 +140,7 @@ app.controller("ContattiController", [
     if (AUTH_TOKEN) {
       $scope.message = "";
       $http
-        .get("https://rubrica-api.onrender.com/api/contacts/all", {
+        .get(`${CONFIG.apiUrl}/api/contacts/all`, {
           headers: { Authorization: "Bearer " + AUTH_TOKEN },
         })
         .then((res) => {
@@ -161,7 +163,7 @@ app.controller("ContattiController", [
     $scope.deleteContact = function (id) {
       if (AUTH_TOKEN) {
         $http
-          .delete("https://rubrica-api.onrender.com/api/contacts/delete", {
+          .delete(`${CONFIG.apiUrl}/api/contacts/delete`, {
             params: { userId: id },
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
@@ -181,7 +183,7 @@ app.controller("ContattiController", [
 
       if (AUTH_TOKEN) {
         $http
-          .get("https://rubrica-api.onrender.com/api/contacts/byValues", {
+          .get(`${CONFIG.apiUrl}/api/contacts/byValues`, {
             params: { nome: nome, cognome: cognome, cellulare: cellulare },
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
@@ -204,8 +206,8 @@ app.controller("NuovoContattoController", [
   "$scope",
   "$http",
   "$location",
-  "API_URL",
-  function ($scope, $http, $location, API_URL) {
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.add = {};
@@ -225,13 +227,9 @@ app.controller("NuovoContattoController", [
 
         if (AUTH_TOKEN) {
           $http
-            .post(
-              "https://rubrica-api.onrender.com/api/contacts/add",
-              $scope.add,
-              {
-                headers: { Authorization: "Bearer " + AUTH_TOKEN },
-              }
-            )
+            .post(`${CONFIG.apiUrl}/api/contacts/add`, $scope.add, {
+              headers: { Authorization: "Bearer " + AUTH_TOKEN },
+            })
             .then((res) => {
               $scope.add = {};
               $scope.successMessage = res.data.message;
@@ -251,8 +249,8 @@ app.controller("ModificaContattoController", [
   "$scope",
   "$http",
   "$location",
-  "API_URL",
-  function ($scope, $http, $location, API_URL) {
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.successMessage = "";
@@ -261,7 +259,7 @@ app.controller("ModificaContattoController", [
 
     if (AUTH_TOKEN) {
       $http
-        .get("https://rubrica-api.onrender.com/api/contacts/byId", {
+        .get(`${CONFIG.apiUrl}/api/contacts/byId`, {
           params: { id: $location.search().id },
           headers: { Authorization: "Bearer " + AUTH_TOKEN },
         })
@@ -300,13 +298,9 @@ app.controller("ModificaContattoController", [
         }
 
         $http
-          .put(
-            "https://rubrica-api.onrender.com/api/contacts/edit",
-            updatedContact,
-            {
-              headers: { Authorization: "Bearer " + AUTH_TOKEN },
-            }
-          )
+          .put(`${CONFIG.apiUrl}/api/contacts/edit`, updatedContact, {
+            headers: { Authorization: "Bearer " + AUTH_TOKEN },
+          })
           .then((res) => ($scope.successMessage = res.data.message))
           .catch((err) => ($scope.errorMessage = err.data.message));
       };
@@ -319,8 +313,8 @@ app.controller("ModificaContattoController", [
 app.controller("PasswordDimenticataController", [
   "$scope",
   "$http",
-  "API_URL",
-  function ($scope, $http, API_URL) {
+  "CONFIG",
+  function ($scope, $http, CONFIG) {
     $scope.email = "";
     $scope.errorMessage = "";
     $scope.successMessage = "";
@@ -331,13 +325,9 @@ app.controller("PasswordDimenticataController", [
 
       if ($scope.email.length > 0) {
         $http
-          .post(
-            "https://rubrica-api.onrender.com/api/user/send_edit_password",
-            null,
-            {
-              params: { email: $scope.email },
-            }
-          )
+          .post(`${CONFIG.apiUrl}/api/user/send_edit_password`, null, {
+            params: { email: $scope.email },
+          })
           .then((res) => {
             $scope.successMessage = "Controlla la tua casella e-mail";
             $scope.email = "";
@@ -355,8 +345,8 @@ app.controller("ResetPasswordController", [
   "$scope",
   "$http",
   "$location",
-  "API_URL",
-  function ($scope, $http, $location, API_URL) {
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
     if (!$location.search().reset_token) {
       $location.path("/");
     }
@@ -393,16 +383,12 @@ app.controller("ResetPasswordController", [
       }
 
       $http
-        .post(
-          "https://rubrica-api.onrender.com/api/user/reset_password",
-          null,
-          {
-            params: {
-              password: $scope.nuova_password,
-              resetToken: $location.search().reset_token,
-            },
-          }
-        )
+        .post(`${CONFIG.apiUrl}/api/user/reset_password`, null, {
+          params: {
+            password: $scope.nuova_password,
+            resetToken: $location.search().reset_token,
+          },
+        })
         .then((res) => {
           $scope.successMessage = res.data.message;
           $scope.nuova_password = "";
@@ -420,8 +406,8 @@ app.controller("ModificaPasswordController", [
   "$scope",
   "$http",
   "$location",
-  "API_URL",
-  function ($scope, $http, $location, API_URL) {
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
     $scope.isDisabled = false;
@@ -458,7 +444,7 @@ app.controller("ModificaPasswordController", [
 
       $http
         .post(
-          "https://rubrica-api.onrender.com/api/user/edit_password",
+          `${CONFIG.apiUrl}/api/user/edit_password`,
           { password: $scope.nuova_password },
           {
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
