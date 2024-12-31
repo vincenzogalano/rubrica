@@ -146,6 +146,13 @@ button:hover {
   cursor: pointer;
 }
 
+.profile-photo {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .btn.new-contact-button:hover,
 .edit-password-button:hover,
 .register-button:hover {

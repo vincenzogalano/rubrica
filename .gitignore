@@ -1,3 +1,5 @@
 /app/rubrica-api/
 
 /app/config.js
+
+.htaccess

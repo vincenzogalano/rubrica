@@ -1,6 +1,16 @@
 <div class="container mt-5 shadow p-4 rounded">
     <h2 class="mb-4">Modifica Contatto</h2>
     <form>
+        <div class="mb-3 text-center">
+            <img ng-src="{{edit.photo_preview}}" class="profile-photo img-fluid shadow" alt="Anteprima foto profilo" />
+        </div>
+        <div>
+            <input type="file" class="form-control" id="foto" name="foto"
+                onchange="angular.element(this).scope().onFileChange(this)">
+        </div>
+        <div class="mb-3">
+            <button type="button" class="mt-2 btn btn-warning btn-sm" ng-click="removePhoto()">Rimuovi Foto</button>
+        </div>
         <div class="mb-3">
             <label for="nome" class="form-label">Nome</label>
             <input type="text" class="form-control" id="nome" name="nome" placeholder="Inserisci il nome"

@@ -150,7 +150,7 @@ app.controller("ContattiController", [
           }
           $scope.allContacts = res.data.data;
         })
-        .catch((err) => ($scope.message = err.data.message));
+        .catch((err) => ($scope.message = err.data?.message));
     } else {
       $location.path("/");
     }
@@ -253,9 +253,13 @@ app.controller("ModificaContattoController", [
   function ($scope, $http, $location, CONFIG) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
+    let imageUrl = "";
+
     $scope.successMessage = "";
     $scope.errorMessage = "";
     $scope.edit = {};
+    $scope.edit.uploaded_photo = null;
+    $scope.edit.photo_preview = CONFIG.photoFallback;
 
     if (AUTH_TOKEN) {
       $http
@@ -267,6 +271,21 @@ app.controller("ModificaContattoController", [
           $scope.edit.nome = res.data.data.nome;
           $scope.edit.cognome = res.data.data.cognome;
           $scope.edit.cellulare = res.data.data.cellulare;
+          imageUrl = res.data.data.photoUrl;
+
+          if (imageUrl) {
+            $http
+              .get(`${CONFIG.apiUrl}/api/resources/get_image`, {
+                params: { imagePath: imageUrl },
+                headers: { Authorization: "Bearer " + AUTH_TOKEN },
+              })
+              .then((res) => {
+                $scope.edit.photo_preview = `data:${res.data.mime_type};base64,${res.data.data}`;
+              })
+              .catch(
+                (err) => ($scope.edit.photo_preview = CONFIG.photoFallback)
+              );
+          }
         })
         .catch((err) => err.data.message);
 
@@ -278,6 +297,10 @@ app.controller("ModificaContattoController", [
           nome: $scope.edit.nome,
           cognome: $scope.edit.cognome,
           cellulare: $scope.edit.cellulare,
+          photoUrl:
+            $scope.edit.photo_preview == CONFIG.photoFallback
+              ? null
+              : $scope.edit.photo_preview,
         };
 
         $scope.successMessage = "";
@@ -301,8 +324,76 @@ app.controller("ModificaContattoController", [
           .put(`${CONFIG.apiUrl}/api/contacts/edit`, updatedContact, {
             headers: { Authorization: "Bearer " + AUTH_TOKEN },
           })
-          .then((res) => ($scope.successMessage = res.data.message))
-          .catch((err) => ($scope.errorMessage = err.data.message));
+          .then((res) => {
+            $scope.successMessage = res.data.message;
+          })
+          .catch(
+            (err) =>
+              ($scope.errorMessage =
+                err.data?.message || "Errore durante la modifica del contatto")
+          );
+
+        if ($scope.edit.uploaded_photo != null) {
+          let formData = new FormData();
+          formData.append("file", $scope.edit.uploaded_photo);
+          formData.append("contactId", $location.search().id);
+
+          $http.post(`${CONFIG.apiUrl}/api/contacts/upload_photo`, formData, {
+            headers: {
+              Authorization: "Bearer " + AUTH_TOKEN,
+              "Content-Type": undefined,
+            },
+          });
+        }
+      };
+
+      $scope.onFileChange = function (inputElement) {
+        const file = inputElement.files[0];
+
+        $scope.errorMessage = "";
+
+        if (file) {
+          const validTypes = ["image/jpeg", "image/png"];
+          const maxSizeInBytes = 2 * 1024 * 1024;
+
+          if (!validTypes.includes(file.type)) {
+            $scope.$apply(function () {
+              $scope.errorMessage =
+                "Il file deve essere un'immagine (JPEG, PNG)";
+            });
+            return;
+          }
+
+          if (file.size > maxSizeInBytes) {
+            $scope.$apply(function () {
+              $scope.errorMessage =
+                "Il file è troppo grande. La dimensione massima è di 2 MB";
+            });
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            $scope.$apply(function () {
+              $scope.edit.photo_preview = e.target.result;
+              $scope.edit.uploaded_photo = file;
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      $scope.removePhoto = function () {
+        if ($scope.edit.photo_preview != CONFIG.photoFallback) {
+          $http
+            .delete(`${CONFIG.apiUrl}/api/contacts/remove_photo`, {
+              params: { contactId: $location.search().id },
+              headers: { Authorization: "Bearer " + AUTH_TOKEN },
+            })
+            .then((res) => {
+              $scope.edit.photo_preview = CONFIG.photoFallback;
+            });
+        }
       };
     } else {
       $location.path("/");
