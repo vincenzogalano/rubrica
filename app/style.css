@@ -107,6 +107,10 @@ button:hover {
   font-weight: bold;
 }
 
+.msg-height {
+  max-height: 500px;
+}
+
 @media only screen and (max-width: 770px) {
   .chat-container {
     min-width: auto;
