@@ -49,6 +49,15 @@ app.config(function ($routeProvider, $locationProvider) {
   $locationProvider.html5Mode(true);
 });
 
+app.filter("truncate", function () {
+  return function (input, maxLength) {
+    if (input.length > maxLength) {
+      return input.substring(0, maxLength) + "...";
+    }
+    return input;
+  };
+});
+
 app.controller("LoginController", [
   "$scope",
   "$http",
@@ -568,14 +577,14 @@ app.controller("ChatController", [
     // Inizializzazione
     $scope.content = "";
     $scope.currentUserId;
-    $scope.selectedConversation;
+    $scope.selectedConversation = null;
     $scope.canSendMessage = false;
     $scope.photo_fallback = CONFIG.photoFallback;
     $scope.selectedContact = 0;
 
     // Data
     $scope.conversationsList = [];
-    $scope.currentChat = {};
+    $scope.currentChat = [];
 
     if (AUTH_TOKEN) {
       // Recupera tutti i contatti dell'utente
@@ -604,7 +613,7 @@ app.controller("ChatController", [
       // Gestione valori Combo Box
       $scope.onContactSelect = function () {
         if ($scope.selectedContact !== 0) {
-          $scope.currentChat = {};
+          $scope.currentChat = [];
           $scope.selectedConversation = null;
           $scope.canSendMessage = true;
         } else {
@@ -628,15 +637,32 @@ app.controller("ChatController", [
         }
 
         $http
-          .get(`${CONFIG.apiUrl}/api/chat/retrieve_conversation_messages`, {
-            params: {
-              sender_id: $scope.currentUserId,
-              receiver_id: $scope.selectedConversation,
-            },
-            headers: { Authorization: "Bearer " + AUTH_TOKEN },
-          })
+          .post(
+            `${CONFIG.apiUrl}/api/chat/retrieve_conversation_messages`,
+            null,
+            {
+              params: {
+                sender_id: $scope.currentUserId,
+                receiver_id: $scope.selectedConversation,
+              },
+              headers: { Authorization: "Bearer " + AUTH_TOKEN },
+            }
+          )
           .then((res) => {
             $scope.currentChat = res.data.data;
+            const index = $scope.conversationsList.findIndex(
+              (c) => c.id === conversation.id
+            );
+            if (index !== -1) {
+              $scope.conversationsList[index].read = true;
+            }
+            angular
+              .element(
+                document.querySelector(
+                  `.conversation-item[data-conversation-id="${conversation.id}"]`
+                )
+              )
+              .removeClass("unread-message");
           })
           .catch((err) => console.log(err));
       };
@@ -663,7 +689,7 @@ app.controller("ChatController", [
 
         let messageData = {
           senderId: $scope.currentUserId,
-          receiverId: $scope.selectedConversation,
+          receiverId: $scope.selectedConversation || $scope.selectedContact,
           content: $scope.content,
         };
 
@@ -679,18 +705,36 @@ app.controller("ChatController", [
 
               // Aggiorna la chat corrente
               $http
-                .get(
+                .post(
                   `${CONFIG.apiUrl}/api/chat/retrieve_conversation_messages`,
+                  null,
                   {
                     params: {
                       sender_id: $scope.currentUserId,
-                      receiver_id: $scope.selectedConversation,
+                      receiver_id:
+                        $scope.selectedConversation || $scope.selectedContact,
                     },
                     headers: { Authorization: "Bearer " + AUTH_TOKEN },
                   }
                 )
                 .then((res) => {
                   $scope.currentChat = res.data.data;
+                })
+                .catch((err) => console.log(err));
+
+              // Aggiorna le conversazioni
+              $http
+                .get(`${CONFIG.apiUrl}/api/chat/retrieve_conversations`, {
+                  headers: { Authorization: "Bearer " + AUTH_TOKEN },
+                })
+                .then((res) => {
+                  $scope.currentUserId = res.data.user;
+                  $scope.conversationsList = [
+                    ...res.data.data.messages,
+                    ...res.data.data.draftMessages,
+                  ].sort((a, b) => {
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                  });
                 })
                 .catch((err) => console.log(err));
             },

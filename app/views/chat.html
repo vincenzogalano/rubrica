@@ -12,15 +12,16 @@
 
             <div class="conversations-list-container overflow-auto">
                 <div class="d-flex align-items-center p-2 border-bottom cur-pointer"
-                    ng-repeat="conversation in conversationsList"
-                    ng-click="selectConversation(conversation)">
+                    ng-repeat="conversation in conversationsList" ng-click="selectConversation(conversation)"
+                    ng-class="{'unread-message': !conversation.read && conversation.receiver.id === currentUserId}"
+                    data-conversation-id="{{conversation.id}}">
                     <img ng-src="{{photo_fallback}}" class="conversation-photo-preview rounded-circle me-2">
                     <div class="w-100">
                         <div>
                             <h6 class="mb-0">
                                 {{getConversationName(conversation)}}
                             </h6>
-                            <small class="text-muted">{{conversation.content}}</small>
+                            <small class="text-muted">{{conversation.content | truncate:16}}</small>
                         </div>
                     </div>
                 </div>
@@ -34,7 +35,7 @@
                     <div ng-if="currentChat.length > 0" ng-repeat="message in currentChat | orderBy:'timestamp'"
                         ng-class="{'bg-success text-white ms-auto': message.sender.id == currentUserId, 
                                    'bg-danger text-white': message.sender.id != currentUserId}"
-                        class="p-2 rounded w-75 mb-2">
+                        class="message-bubble p-2 rounded w-75 mb-2">
                         {{message.content}}
                     </div>
                 </div>
@@ -62,10 +63,11 @@
                     {{contact.cognome}}
                 </option>
             </select>
-            <button class="btn btn-primary w-100 mb-2">Inizia chat</button>
             <div class="conversations-list-container-mobile overflow-auto rounded p-2">
                 <div class="d-flex align-items-center py-2 border-bottom" ng-repeat="conversation in conversationsList"
-                    ng-click="selectConversation(conversation)">
+                    ng-click="selectConversation(conversation)"
+                    ng-class="{'unread-message': !conversation.read && conversation.receiver.id === currentUserId}"
+                    data-conversation-id="{{conversation.id}}">
                     <img ng-src="{{photo_fallback}}" class="conversation-photo-preview rounded-circle me-2">
                     <div class="w-100">
                         {{getConversationName(conversation)}}
@@ -78,8 +80,8 @@
             <h4 class="border-bottom p-2">Chat</h4>
             <div class="msg-height flex-grow-1 overflow-auto p-3">
                 <div ng-if="currentChat.length > 0" ng-repeat="message in currentChat | orderBy:'timestamp'" ng-class="{'bg-success text-white ms-auto': message.sender.id == currentUserId, 
-                                   'bg-danger text-white': message.sender.id != currentUserId}"
-                    class="p-2 rounded w-75 mb-2">
+                    'bg-danger text-white': message.sender.id != currentUserId}"
+                    class="message-bubble p-2 rounded w-75 mb-2">
                     {{message.content}}
                 </div>
             </div>
