@@ -1,5 +1,5 @@
 const configurations = {
-  apiUrl: "http://localhost:8080",
+  apiUrl: "https://rubrica-api.onrender.com",
   photoFallback: "/app/assets/photo_fallback.png",
 };
 
