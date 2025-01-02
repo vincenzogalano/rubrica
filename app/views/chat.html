@@ -1,0 +1,94 @@
+<div class="container-fluid p-3 chat-container shadow">
+    <!-- Desktop/Tablet View -->
+    <div class="row g-3 d-none d-md-flex h-100">
+        <div class="col-md-4 border-end">
+            <h3>Conversazioni</h3>
+            <select ng-model="selectedContact" ng-change="onContactSelect()" class="form-select mb-2">
+                <option ng-value="0">Nuova chat</option>
+                <option ng-repeat="contact in contactsList" ng-value="{{contact.id}}">{{contact.nome}}
+                    {{contact.cognome}}
+                </option>
+            </select>
+
+            <div class="conversations-list-container overflow-auto">
+                <div class="d-flex align-items-center p-2 border-bottom cur-pointer"
+                    ng-repeat="conversation in conversationsList"
+                    ng-class="{'unread-message': conversation.receiver && !conversation.read}"
+                    ng-click="selectConversation(conversation)">
+                    <img ng-src="{{photo_fallback}}" class="conversation-photo-preview rounded-circle me-2">
+                    <div class="w-100">
+                        <div>
+                            <h6 class="mb-0">
+                                {{getConversationName(conversation)}}
+                            </h6>
+                            <small class="text-muted">{{conversation.content}}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="d-flex flex-column h-100">
+                <h4 class="border-bottom p-2">Mario Rossi</h4>
+                <div class="flex-grow-1 overflow-auto p-3">
+                    <div ng-if="currentChat.length > 0" ng-repeat="message in currentChat | orderBy:'timestamp'"
+                        ng-class="{'bg-success text-white ms-auto': message.sender.id == currentUserId, 
+                                   'bg-danger text-white': message.sender.id != currentUserId}"
+                        class="p-2 rounded w-75 mb-2">
+                        {{message.content}}
+                    </div>
+                </div>
+                <div class="border-top p-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Messaggio..." ng-model="content">
+                        <button ng-disabled="!canSendMessage" class="btn btn-primary"
+                            ng-click="sendMessage()">Invia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="d-md-none">
+        <button class="btn btn-secondary w-100 mb-3" data-bs-toggle="collapse" data-bs-target="#mobileChats">
+            Conversazioni
+        </button>
+
+        <div id="mobileChats" class="collapse mb-3">
+            <select ng-model="selectedContact" ng-change="onContactSelect()" class="form-select mb-2">
+                <option ng-value="0">Nuova chat</option>
+                <option ng-repeat="contact in contactsList" ng-value="{{contact.id}}">{{contact.nome}}
+                    {{contact.cognome}}
+                </option>
+            </select>
+            <button class="btn btn-primary w-100 mb-2">Inizia chat</button>
+            <div class="conversations-list-container-mobile overflow-auto rounded p-2">
+                <div class="d-flex align-items-center py-2 border-bottom" ng-repeat="conversation in conversationsList"
+                    ng-class="{'unread-message': conversation.receiver && !conversation.read}"
+                    ng-click="selectConversation(conversation)">
+                    <img ng-src="{{photo_fallback}}" class="conversation-photo-preview rounded-circle me-2">
+                    <div class="w-100">
+                        {{getConversationName(conversation)}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column h-100">
+            <h4 class="border-bottom p-2">Mario Rossi</h4>
+            <div class="flex-grow-1 overflow-auto p-3">
+                <div ng-if="currentChat.length > 0" ng-repeat="message in currentChat | orderBy:'timestamp'" ng-class="{'bg-success text-white ms-auto': message.sender.id == currentUserId, 
+                                   'bg-danger text-white': message.sender.id != currentUserId}"
+                    class="p-2 rounded w-75 mb-2">
+                    {{message.content}}
+                </div>
+            </div>
+            <div class="input-group mt-auto p-2">
+                <input type="text" class="form-control" placeholder="Messaggio..." ng-model="content">
+                <button ng-disabled="!canSendMessage" class="btn btn-primary" ng-click="sendMessage()">Invia</button>
+            </div>
+        </div>
+    </div>
+</div>

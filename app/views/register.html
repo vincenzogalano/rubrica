@@ -33,6 +33,10 @@
             <input class="rounded" type="text" id="cognome" name="cognome" ng-model="user.cognome">
         </div>
         <div class="form-input my-3">
+            <label for="cellulare">Numero di cellulare</label>
+            <input class="rounded" type="tel" id="cellulare" name="cellulare" ng-model="user.cellulare">
+        </div>
+        <div class="form-input my-3">
             <label for="data_di_nascita">Data di nascita</label>
             <input class="form-control" type="date" id="data_di_nascita" name="data_di_nascita"
                 ng-model="user.data_di_nascita">
@@ -48,12 +52,12 @@
             <label for="citta">Città</label>
             <input class="rounded" type="text" id="citta" name="citta" ng-model="user.citta">
         </div>
+        <div class="text-center">
+            <span class="text-success" ng-show="registrationSuccess">{{registrationSuccessMessage}}</span>
+            <span class="text-danger" ng-show="registrationFailed">{{registrationFailedMessage}}</span>
+        </div>
         <button class="primary-button my-3" type="submit">Registrati</button>
     </form>
-    <div class="text-center">
-        <span class="text-success" ng-show="registrationSuccess">{{registrationSuccessMessage}}</span>
-        <span class="text-danger" ng-show="registrationFailed">{{registrationFailedMessage}}</span>
-    </div>
     <div class="login-link">
         <p>Hai già un account? <a href="/">Accedi qui</a></p>
     </div>

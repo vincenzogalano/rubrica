@@ -38,6 +38,10 @@ app.config(function ($routeProvider, $locationProvider) {
       templateUrl: "app/views/edit_contact.html",
       controller: "ModificaContattoController",
     })
+    .when("/chat", {
+      templateUrl: "app/views/chat.html",
+      controller: "ChatController",
+    })
     .otherwise({
       redirectTo: "/",
     });
@@ -93,7 +97,7 @@ app.controller("RegisterController", [
       $scope.registrationFailed = false;
 
       for (let [key, value] of Object.entries($scope.user)) {
-        if (!value || value.trim() === "") {
+        if (!value) {
           $scope.registrationFailed = true;
           $scope.registrationFailedMessage = "Compilare tutti i campi";
           return;
@@ -550,5 +554,153 @@ app.controller("ModificaPasswordController", [
           $scope.errorMessage = err.data.message || "Errore sconosciuto";
         });
     };
+  },
+]);
+
+app.controller("ChatController", [
+  "$scope",
+  "$http",
+  "$location",
+  "CONFIG",
+  function ($scope, $http, $location, CONFIG) {
+    const AUTH_TOKEN = localStorage.getItem("auth_token");
+
+    // Inizializzazione
+    $scope.content = "";
+    $scope.currentUserId;
+    $scope.selectedConversation;
+    $scope.canSendMessage = false;
+    $scope.photo_fallback = CONFIG.photoFallback;
+    $scope.selectedContact = 0;
+
+    // Data
+    $scope.conversationsList = [];
+    $scope.currentChat = {};
+
+    if (AUTH_TOKEN) {
+      // Recupera tutti i contatti dell'utente
+      $http
+        .get(`${CONFIG.apiUrl}/api/contacts/all`, {
+          headers: { Authorization: "Bearer " + AUTH_TOKEN },
+        })
+        .then((res) => ($scope.contactsList = res.data.data));
+
+      // Recupera tutte le conversazioni dell'utente
+      $http
+        .get(`${CONFIG.apiUrl}/api/chat/retrieve_conversations`, {
+          headers: { Authorization: "Bearer " + AUTH_TOKEN },
+        })
+        .then((res) => {
+          $scope.currentUserId = res.data.user;
+          $scope.conversationsList = [
+            ...res.data.data.messages,
+            ...res.data.data.draftMessages,
+          ].sort((a, b) => {
+            return new Date(b.timestamp) - new Date(a.timestamp);
+          });
+        })
+        .catch((err) => console.log(err));
+
+      // Gestione valori Combo Box
+      $scope.onContactSelect = function () {
+        if ($scope.selectedContact !== 0) {
+          $scope.currentChat = {};
+          $scope.selectedConversation = null;
+          $scope.canSendMessage = true;
+        } else {
+          $scope.canSendMessage =
+            Object.keys($scope.currentChat).length === 0 ? false : true;
+        }
+      };
+
+      // Cambio conversazione
+      $scope.selectConversation = function (conversation) {
+        $scope.selectedContact = 0;
+        $scope.canSendMessage = true;
+
+        if (conversation.receiver) {
+          $scope.selectedConversation =
+            conversation.sender.id === $scope.currentUserId
+              ? conversation.receiver.id
+              : conversation.sender.id;
+        } else if (conversation.contactReceiver) {
+          $scope.selectedConversation = conversation.contactReceiver.id;
+        }
+
+        $http
+          .get(`${CONFIG.apiUrl}/api/chat/retrieve_conversation_messages`, {
+            params: {
+              sender_id: $scope.currentUserId,
+              receiver_id: $scope.selectedConversation,
+            },
+            headers: { Authorization: "Bearer " + AUTH_TOKEN },
+          })
+          .then((res) => {
+            $scope.currentChat = res.data.data;
+          })
+          .catch((err) => console.log(err));
+      };
+
+      // Recupera Nome e Cognome delle conversazioni
+      $scope.getConversationName = function (conversation) {
+        if (conversation.receiver) {
+          return conversation.sender.id === $scope.currentUserId
+            ? conversation.receiver.nome + " " + conversation.receiver.cognome
+            : conversation.sender.nome + " " + conversation.sender.cognome;
+        } else if (conversation.contactReceiver) {
+          return (
+            conversation.contactReceiver.nome +
+            " " +
+            conversation.contactReceiver.cognome
+          );
+        }
+        return "Utente sconosciuto";
+      };
+
+      // Invio messaggio
+      $scope.sendMessage = function () {
+        if (!$scope.content) return;
+
+        let messageData = {
+          senderId: $scope.currentUserId,
+          receiverId: $scope.selectedConversation,
+          content: $scope.content,
+        };
+
+        $http
+          .post(`${CONFIG.apiUrl}/api/chat/send_message`, messageData, {
+            headers: {
+              Authorization: "Bearer " + AUTH_TOKEN,
+            },
+          })
+          .then(
+            function (response) {
+              $scope.content = "";
+
+              // Aggiorna la chat corrente
+              $http
+                .get(
+                  `${CONFIG.apiUrl}/api/chat/retrieve_conversation_messages`,
+                  {
+                    params: {
+                      sender_id: $scope.currentUserId,
+                      receiver_id: $scope.selectedConversation,
+                    },
+                    headers: { Authorization: "Bearer " + AUTH_TOKEN },
+                  }
+                )
+                .then((res) => {
+                  $scope.currentChat = res.data.data;
+                })
+                .catch((err) => console.log(err));
+            },
+            function (error) {
+              console.error("Errore invio messaggio:", error);
+            }
+          );
+      };
+    } else {
+      $location.path("/");
+    }
   },
 ]);
