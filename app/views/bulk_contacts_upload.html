@@ -1,0 +1,34 @@
+<div class="container my-4 shadow p-3 rounded">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Importa Contatti</h2>
+            <div class="mb-4">
+                <p>Formati supportati: .xlsx, .xls, .csv</p>
+                <p>Il file deve contenere le seguenti colonne: Nome, Cognome, Cellulare</p>
+            </div>
+            <div class="mb-3">
+                <label for="fileInput" class="form-label">Seleziona file</label>
+                <input type="file" id="fileInput" class="form-control" accept=".xlsx,.xls,.csv"
+                    file-model="contactFile">
+            </div>
+            <div class="mb-3" ng-show="uploading">
+                <p>Progresso:</p>
+                <progress value="{{progress}}" max="100">
+                    {{progress}}%
+                </progress>
+            </div>
+            <div class="text-center my-2">
+                <span class="text-success" ng-show="successMessage.length > 0">{{successMessage}}</span>
+            </div>
+            <div class="text-center my-2">
+                <span class="text-danger" ng-show="errorMessage.length > 0">{{errorMessage}}</span>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                <button class="btn btn-primary" ng-click="uploadContacts(contactFile)" ng-disabled="!contactFile">
+                    <i class="fas fa-upload me-2"></i>Carica File
+                </button>
+                <a ng-href="/contatti" class="btn btn-danger">Torna Indietro</a>
+            </div>
+        </div>
+    </div>
+</div>

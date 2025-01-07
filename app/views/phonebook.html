@@ -1,3 +1,23 @@
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notificationsModalLabel">Nuove Notifiche</h5>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group">
+            <li class="list-group-item" ng-repeat="notification in notifications">
+              {{ notification.message }}
+            </li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" ng-click="markAsRead()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div class="container my-4 shadow p-3 rounded">
     <div class="row g-3">
         <div class="col-md-6 d-flex flex-column justify-content-between">
@@ -27,7 +47,12 @@
             </div>
         </div>
         <div class="col-md-6">
-            <h2>Lista Contatti</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Lista Contatti</h2>
+                <a ng-if="loggedUser.admin" ng-href="/carica_contatti" class="btn btn-warning">
+                    <i class="fas fa-file-import text-white"></i>
+                </a>
+            </div>
             <div class="text-center alert alert-info" ng-show="message.length > 0">
                 {{message}}
             </div>

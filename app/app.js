@@ -4,6 +4,8 @@ const app = angular.module("app", ["ngRoute"]);
 
 app.constant("CONFIG", configurations);
 
+// Config
+
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
     .when("/", {
@@ -42,12 +44,18 @@ app.config(function ($routeProvider, $locationProvider) {
       templateUrl: "app/views/chat.html",
       controller: "ChatController",
     })
+    .when("/carica_contatti", {
+      templateUrl: "app/views/bulk_contacts_upload.html",
+      controller: "BulkUploadController",
+    })
     .otherwise({
       redirectTo: "/",
     });
 
   $locationProvider.html5Mode(true);
 });
+
+// Filter
 
 app.filter("truncate", function () {
   return function (input, maxLength) {
@@ -57,6 +65,40 @@ app.filter("truncate", function () {
     return input;
   };
 });
+
+// Direttive
+
+app.directive("fileModel", [
+  "$parse",
+  function ($parse) {
+    return {
+      restrict: "A",
+      link: function (scope, element, attrs) {
+        element.bind("change", function () {
+          $parse(attrs.fileModel).assign(scope, element[0].files[0]);
+          scope.$apply();
+        });
+      },
+    };
+  },
+]);
+
+// Service
+
+app.service("UploadService", function () {
+  var uploading = false;
+
+  return {
+    setUploading: function (value) {
+      uploading = value;
+    },
+    isUploading: function () {
+      return uploading;
+    },
+  };
+});
+
+// Controller
 
 app.controller("LoginController", [
   "$scope",
@@ -147,6 +189,8 @@ app.controller("ContattiController", [
   function ($scope, $http, $location, CONFIG) {
     const AUTH_TOKEN = localStorage.getItem("auth_token");
 
+    $scope.notifications = {};
+    $scope.loggedUser = {};
     $scope.allContacts = {};
     $scope.message = "";
 
@@ -164,6 +208,31 @@ app.controller("ContattiController", [
           $scope.allContacts = res.data.data;
         })
         .catch((err) => ($scope.message = err.data?.message));
+
+      // Recupero User
+      $http
+        .get(`${CONFIG.apiUrl}/api/user/get_logged_user`, {
+          headers: { Authorization: "Bearer " + AUTH_TOKEN },
+        })
+        .then((res) => {
+          $scope.loggedUser = res.data.data;
+          console.log($scope.loggedUser);
+        });
+
+      // Recupero notifiche
+      $http
+        .get(`${CONFIG.apiUrl}/api/notification/get_all`, {
+          headers: { Authorization: "Bearer " + AUTH_TOKEN },
+        })
+        .then((res) => {
+          $scope.notifications = res.data.data;
+          var notificationsModal = new bootstrap.Modal(
+            document.getElementById("notificationsModal")
+          );
+          notificationsModal.show();
+          console.log(res.data);
+        })
+        .catch((err) => console.log("errore"));
     } else {
       $location.path("/");
     }
@@ -211,6 +280,15 @@ app.controller("ContattiController", [
             $scope.message = err.data.message;
           });
       }
+    };
+
+    $scope.markAsRead = function () {
+      $http
+        .post(`${CONFIG.apiUrl}/api/notification/read_all`, null, {
+          headers: { Authorization: "Bearer " + AUTH_TOKEN },
+        })
+        .then((res) => ($scope.notifications = null))
+        .catch((err) => console.log(err));
     };
   },
 ]);
@@ -746,5 +824,66 @@ app.controller("ChatController", [
     } else {
       $location.path("/");
     }
+  },
+]);
+
+app.controller("BulkUploadController", [
+  "$scope",
+  "$http",
+  "CONFIG",
+  "UploadService",
+  function ($scope, $http, CONFIG, UploadService) {
+    const AUTH_TOKEN = localStorage.getItem("auth_token");
+
+    $scope.progress = 0;
+    $scope.uploading = UploadService.isUploading();
+    $scope.errorMessage = "";
+    $scope.successMessage = "";
+
+    $scope.uploadContacts = function (file) {
+      if (UploadService.isUploading()) {
+        console.log("Gia è in corso un upload");
+        return;
+      }
+
+      $scope.errorMessage = "";
+      $scope.successMessage = "";
+      $scope.progress = 0;
+      UploadService.setUploading(true);
+      $scope.uploading = true;
+
+      var formData = new FormData();
+      formData.append("file", file);
+
+      if (AUTH_TOKEN) {
+        $http
+          .post(`${CONFIG.apiUrl}/api/contacts/bulk_upload`, formData, {
+            transformRequest: angular.identity,
+            headers: {
+              "Content-Type": undefined,
+              Authorization: "Bearer " + AUTH_TOKEN,
+            },
+            uploadEventHandlers: {
+              progress: function (e) {
+                $scope.progress = parseInt((100.0 * e.loaded) / e.total);
+              },
+            },
+          })
+          .then((res) => {
+            $scope.successMessage = "Contatti importati correttamente";
+          })
+          .catch((err) => {
+            $scope.errorMessage = "Errore durante il caricamento dei contatti";
+          })
+          .finally(() => {
+            document
+              .getElementById("fileInput")
+              .setAttribute("file-model", null);
+            document.getElementById("fileInput").value = "";
+            UploadService.setUploading(false);
+            $scope.uploading = false;
+          });
+      }
+    };
   },
 ]);
